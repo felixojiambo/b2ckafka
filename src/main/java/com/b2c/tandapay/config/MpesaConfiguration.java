@@ -1,14 +1,12 @@
 package com.b2c.tandapay.config;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
+@ConfigurationProperties(prefix = "mpesa")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class MpesaConfiguration {
 
     private String consumerKey;
@@ -27,10 +25,11 @@ public class MpesaConfiguration {
     private String b2cInitiatorPassword;
     private String transactionResultUrl;
 
+    // Getters and Setters
+
     @Override
     public String toString() {
         return String.format("{consumerKey='%s', consumerSecret='%s', grantType='%s', oauthEndpoint='%s'}",
                 consumerKey, consumerSecret, grantType, oauthEndpoint);
     }
-
 }

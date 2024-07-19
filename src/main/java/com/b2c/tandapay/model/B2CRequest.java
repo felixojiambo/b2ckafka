@@ -13,14 +13,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class B2CRequest {
     @Id
     private String id;
-    private String commandID;
-    private double amount;
-    private String partyB;
-    private String remarks;
-    private String occasion;
-    private String securityCredential;
-    private String resultURL;
-    private String queueTimeOutURL;
-    private String initiatorName;
-    private String partyA;
+    private String OriginatorConversationID;
+    private String InitiatorName;
+    private String SecurityCredential;
+    private String CommandID;
+    private String Amount;
+    private String PartyA;
+    private String PartyB;
+    private String Remarks;
+    private String QueueTimeOutURL;
+    private String ResultURL;
+    private String Occassion;
 }

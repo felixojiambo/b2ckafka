@@ -1,5 +1,4 @@
 package com.b2c.tandapay.controller;
-
 import com.b2c.tandapay.dto.AccessTokenResponse;
 import com.b2c.tandapay.dto.B2CResponse;
 import com.b2c.tandapay.model.B2CRequest;
@@ -48,7 +47,7 @@ public class B2CController {
     // Update payment status by request ID
     @PutMapping("/status/{requestId}")
     public void updatePaymentStatus(@PathVariable String requestId, @RequestBody B2CResponse b2cResponse) {
-        b2cResponse.setId(requestId);
+        b2cResponse.setConversationID(requestId);
         b2cResponseRepository.save(b2cResponse);
     }
 

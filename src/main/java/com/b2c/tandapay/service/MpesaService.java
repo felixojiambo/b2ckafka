@@ -39,18 +39,23 @@ public class MpesaService {
     }
 
     public AccessTokenResponse getAccessToken() {
+        String url = mpesaConfiguration.getOauthEndpoint();
+        if (url == null || url.isEmpty()) {
+            throw new IllegalArgumentException("OAuth endpoint URL is not configured.");
+        }
+
         String credentials = String.format("%s:%s", mpesaConfiguration.getConsumerKey(), mpesaConfiguration.getConsumerSecret());
         String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
 
         Request request = new Request.Builder()
-                .url(String.format("%s?grant_type=%s", mpesaConfiguration.getOauthEndpoint(), mpesaConfiguration.getGrantType()))
+                .url(String.format("%s?grant_type=%s", url, mpesaConfiguration.getGrantType()))
                 .get()
                 .addHeader("Authorization", String.format("Basic %s", encodedCredentials))
                 .addHeader("Cache-Control", "no-cache")
                 .build();
 
         try (Response response = okHttpClient.newCall(request).execute()) {
-            String responseBody = response.body() != null ? response.body().string() : "";
+            String responseBody = response.body().string();
             if (response.isSuccessful()) {
                 return objectMapper.readValue(responseBody, AccessTokenResponse.class);
             } else {
@@ -80,8 +85,11 @@ public class MpesaService {
         b2CRequest.setInitiatorName(mpesaConfiguration.getB2cInitiatorName());
         b2CRequest.setPartyA(mpesaConfiguration.getShortCode());
 
+        String jsonRequest = HelperUtility.toJson(b2CRequest);
+        logger.debug("B2C Request JSON: {}", jsonRequest);
+
         RequestBody body = RequestBody.create(
-                Objects.requireNonNull(HelperUtility.toJson(b2CRequest)), MediaType.parse("application/json"));
+                Objects.requireNonNull(jsonRequest), MediaType.parse("application/json"));
         Request request = new Request.Builder()
                 .url(mpesaConfiguration.getB2cTransactionEndpoint())
                 .post(body)
@@ -89,11 +97,11 @@ public class MpesaService {
                 .build();
 
         try (Response response = okHttpClient.newCall(request).execute()) {
-            String responseBody = response.body() != null ? response.body().string() : "";
+            String responseBody = response.body().string();
             if (response.isSuccessful()) {
                 return objectMapper.readValue(responseBody, B2CResponse.class);
             } else {
-                logger.error("Failed to perform B2C transaction. Response code: {}, message: {}", response.code(), response.message());
+                logger.error("Failed to perform B2C transaction. Response code: {}, message: {}, response body: {}", response.code(), response.message(), responseBody);
                 throw new RuntimeException("Failed to perform B2C transaction. Response code: " + response.code());
             }
         } catch (IOException e) {
